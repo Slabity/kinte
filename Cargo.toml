@@ -1,0 +1,6 @@
+[package]
+name = "kinte"
+version = "0.1.0"
+authors = ["Tyler Slabinski <tslabinski@slabity.net>"]
+
+[dependencies]
