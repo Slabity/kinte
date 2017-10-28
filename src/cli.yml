@@ -1,3 +1,10 @@
 name: kinte
 version: "0.0.1"
 about: kinte is not a terminal emulator
+args:
+    - port:
+        short: p
+        long: port
+        value_name: PORT
+        help: Port number to communication on
+        takes_value: true

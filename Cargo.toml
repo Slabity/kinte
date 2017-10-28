@@ -6,3 +6,4 @@ authors = ["Tyler Slabinski <tslabinski@slabity.net>"]
 [dependencies]
 clap = { version = "*", features = ["yaml"] }
 error-chain = "*"
+serde_json = "*"
