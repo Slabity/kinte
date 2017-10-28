@@ -29,15 +29,12 @@ fn handle_client(stream: &mut TcpStream) -> Result<()> {
             break;
         }
 
-        let read_str = String::from(std::str::from_utf8(&buffer).chain_err(|| "Failed to parse utf-8.")?);
-        let read_str = read_str.trim();
+        let read_str = std::str::from_utf8(&buffer[..read_size]).chain_err(|| "Failed to parse utf-8.")?.trim();
 
-        println!("{:?}", read_str);
-        println!("{}", read_str);
 
-        //let v: Value = serde_json::from_str(&read_str).chain_err(|| "Failed to parse JSON.")?;
+        let v: Value = serde_json::from_str(&read_str).chain_err(|| "Failed to parse JSON.")?;
 
-        //println!("VALUE: {:?}", v["key"]);
+        println!("VALUE: {:?}", v["key"]);
     }
 
 
