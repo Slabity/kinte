@@ -5,13 +5,8 @@ use clap::App;
 #[macro_use]
 extern crate error_chain;
 
-extern crate nix;
-
 mod result;
 use result::*;
-
-use std::io::Write;
-use std::io::Read;
 
 mod process;
 
