@@ -8,6 +8,7 @@ use clap::App;
 use result::*;
 
 mod result;
+mod process;
 mod socket;
 
 
@@ -18,7 +19,6 @@ fn run(port: &str) -> Result<()> {
     println!("Running!");
 
     socket::listen(HOST, port)?;
-
 
     Ok(())
 }
