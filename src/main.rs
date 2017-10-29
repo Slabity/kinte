@@ -5,17 +5,23 @@ use clap::App;
 #[macro_use]
 extern crate error_chain;
 
+extern crate nix;
+
 mod result;
 use result::*;
 
+use std::io::Write;
+use std::io::Read;
+
+mod process;
+
 fn run() -> Result<()> {
-    println!("Running!");
     Ok(())
 }
 
 fn main() {
     let yaml = load_yaml!("cli.yml");
-    let matches = App::from_yaml(yaml).get_matches();
+    let _matches = App::from_yaml(yaml).get_matches();
 
     if let Err(ref e) = run() {
         use std::io::Write;
