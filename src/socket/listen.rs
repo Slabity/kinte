@@ -3,9 +3,27 @@ use ::std::net::{TcpListener, TcpStream};
 use ::serde_json::Value;
 use ::result::*;
 
+use super::commands;
+
 const BUF_SIZE: usize = 1024;
 
+/// Handles a valid JSON request
+pub fn handle_json(request: Value) -> Result<()> {
+    let request = request.as_object().chain_err(|| format!("Invalid request: {:?}.", request))?;
+
+    for (ref key, ref val) in request.iter() {
+        match key.as_ref() {
+            "request" => commands::request(val)?,
+            "ping" => println!("Pinged."),
+            e => return Err(format!("Unknown key: {}", e).into())
+        }
+    }
+
+    Ok(())
+}
+
 /// Each connection is considered a program.
+/// Handle all requests during the session.
 pub fn handle_client(stream: &mut TcpStream) -> Result<()> {
     loop {
         let mut buffer = [ 0; BUF_SIZE ];
@@ -19,10 +37,12 @@ pub fn handle_client(stream: &mut TcpStream) -> Result<()> {
 
         let read_str = ::std::str::from_utf8(&buffer[..read_size]).chain_err(|| "Failed to parse utf-8.")?.trim();
 
+        println!("Received {}", read_str);
 
         let v: Value = ::serde_json::from_str(&read_str).chain_err(|| "Failed to parse JSON.")?;
 
-        println!("VALUE: {:?}", v["key"]);
+
+        handle_json(v)?;
     }
 
 
@@ -30,10 +50,12 @@ pub fn handle_client(stream: &mut TcpStream) -> Result<()> {
     Ok(())
 }
 
+/// Listen and handle requests
 pub fn listen(host: &str, port: &str) -> Result<()> {
     let port = port.parse::<u16>().expect("Invalid port.");
     let bind_str = format!("{}:{}", host, port);
 
+    println!("Listening on {}", &bind_str);
 
     let listener = TcpListener::bind(bind_str).expect("Failed to bind.");
 
