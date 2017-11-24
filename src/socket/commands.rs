@@ -1,8 +1,8 @@
 /// TODO: Macro for all of this from YAML file.
+/// Handlers for all kinte requests.
 use ::serde_json::Value;
 use ::result::*;
 
-/// TODO: Remove head error check outside of this function
 /// Performs the request command.
 pub fn request(request: &Value) -> Result<()> {
     let request = request.as_object().chain_err(|| "command request expects object as value")?;

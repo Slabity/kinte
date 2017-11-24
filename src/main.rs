@@ -12,13 +12,13 @@ mod process;
 mod socket;
 
 
-const HOST: &'static str = "127.0.0.1";
-const DEFAULT_PORT: &'static str = "12345";
+const DEFAULT_SOCK: &'static str = "kinte.sock";
 
-fn run(port: &str) -> Result<()> {
+fn run() -> Result<()> {
     println!("Running!");
 
-    socket::listen(HOST, port)?;
+    // TODO: define socket location
+    socket::listen(&DEFAULT_SOCK);
 
     Ok(())
 }
@@ -26,10 +26,8 @@ fn run(port: &str) -> Result<()> {
 fn main() {
     let yaml = load_yaml!("cli.yml");
     let matches = App::from_yaml(yaml).get_matches();
-    let listen_port = matches.value_of("port")
-                             .unwrap_or(DEFAULT_PORT);
 
-    if let Err(ref e) = run(listen_port) {
+    if let Err(ref e) = run() {
         use std::io::Write;
         let stderr = &mut ::std::io::stderr();
         let msg = "Error writing to stderr";

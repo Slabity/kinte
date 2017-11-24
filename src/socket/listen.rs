@@ -1,5 +1,5 @@
 use ::std::io::Read;
-use ::std::net::{TcpListener, TcpStream};
+use ::std::os::unix::net::{UnixListener, UnixStream};
 use ::serde_json::Value;
 use ::result::*;
 
@@ -7,7 +7,7 @@ use super::commands;
 
 const BUF_SIZE: usize = 1024;
 
-/// Handles a valid JSON request
+/// Handles a kinte JSON request
 pub fn handle_json(request: Value) -> Result<()> {
     let request = request.as_object().chain_err(|| format!("Invalid request: {:?}.", request))?;
 
@@ -24,7 +24,7 @@ pub fn handle_json(request: Value) -> Result<()> {
 
 /// Each connection is considered a program.
 /// Handle all requests during the session.
-pub fn handle_client(stream: &mut TcpStream) -> Result<()> {
+pub fn handle_client(stream: &mut UnixStream) -> Result<()> {
     loop {
         let mut buffer = [ 0; BUF_SIZE ];
 
@@ -41,7 +41,6 @@ pub fn handle_client(stream: &mut TcpStream) -> Result<()> {
 
         let v: Value = ::serde_json::from_str(&read_str).chain_err(|| "Failed to parse JSON.")?;
 
-
         handle_json(v)?;
     }
 
@@ -51,20 +50,17 @@ pub fn handle_client(stream: &mut TcpStream) -> Result<()> {
 }
 
 /// Listen and handle requests
-pub fn listen(host: &str, port: &str) -> Result<()> {
-    let port = port.parse::<u16>().expect("Invalid port.");
-    let bind_str = format!("{}:{}", host, port);
+pub fn listen(path: &str) -> Result<()> {
+    println!("Creating unix domain socket on {}", &path);
 
-    println!("Listening on {}", &bind_str);
-
-    let listener = TcpListener::bind(bind_str).expect("Failed to bind.");
+    let listener = UnixListener::bind(&path).chain_err(|| "Failed to bind socket.")?;
 
     for stream in listener.incoming() {
         let mut stream = stream.chain_err(|| "Failed to open stream.")?;
-        match handle_client(&mut stream).chain_err(|| "Failed handling stream.") {
+        match handle_client(&mut stream) {
             Ok(_) => {},
             Err(e) => {
-                println!(" Failed to handle connection: {}", e);
+                println!("Failed to handle connection: {}", e);
             }
         }
     }
