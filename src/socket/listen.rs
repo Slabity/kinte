@@ -1,5 +1,6 @@
 use ::std::io::Read;
 use ::std::os::unix::net::{UnixListener, UnixStream};
+use ::std::path::Path;
 use ::serde_json::Value;
 use ::result::*;
 
@@ -53,6 +54,11 @@ pub fn handle_client(stream: &mut UnixStream) -> Result<()> {
 pub fn listen(path: &str) -> Result<()> {
     println!("Creating unix domain socket on {}", &path);
 
+    // bind does not seem to return an error if the socket exists.
+    // Likely because the connection was improperly closed
+    if Path::new(&path).exists() {
+        return Err(format!("{} exists.", &path).into());
+    }
     let listener = UnixListener::bind(&path).chain_err(|| "Failed to bind socket.")?;
 
     for stream in listener.incoming() {

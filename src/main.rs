@@ -18,7 +18,7 @@ fn run() -> Result<()> {
     println!("Running!");
 
     // TODO: define socket location
-    socket::listen(&DEFAULT_SOCK);
+    socket::listen(&DEFAULT_SOCK)?;
 
     Ok(())
 }
